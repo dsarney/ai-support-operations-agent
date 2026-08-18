@@ -48,7 +48,7 @@ def cmd_seed(settings: Settings) -> None:
     engine = create_db_engine(settings.database_url)
     data_dir = settings.resolved_data_dir()
     reset_and_seed(engine, data_dir)
-    print(f"Seeded {settings.database_url} from {data_dir}")
+    print(f"Seeded {settings.database_url} from {data_dir}", flush=True)
 
 
 def cmd_run_all(settings: Settings, fake: bool) -> None:
@@ -66,10 +66,10 @@ def cmd_run_all(settings: Settings, fake: bool) -> None:
             print("No open tickets.")
             return
         for ticket in tickets:
-            print(f"Running {ticket.id} — {ticket.subject}")
+            print(f"Running {ticket.id} — {ticket.subject}", flush=True)
             run = AgentPipeline(session, settings, llm).run(ticket.id)
             session.commit()
-            print(f"  → {run.outcome or run.status}")
+            print(f"  → {run.outcome or run.status}", flush=True)
 
 
 def cmd_serve(settings: Settings, fake: bool, reload: bool) -> None:
@@ -91,8 +91,8 @@ def cmd_serve(settings: Settings, fake: bool, reload: bool) -> None:
 def cmd_demo(settings: Settings, fake: bool, no_run: bool) -> None:
     """Seed, start the dashboard immediately, then run tickets in the background."""
     cmd_seed(settings)
-    print(f"\nDashboard: http://{settings.host}:{settings.port}")
-    print("Open that URL now. Tickets will fill in as the agent works.\n")
+    print(f"\nDashboard: http://{settings.host}:{settings.port}", flush=True)
+    print("Open that URL now. Tickets will fill in as the agent works.\n", flush=True)
     if not no_run:
         threading.Thread(
             target=cmd_run_all,
