@@ -1,0 +1,58 @@
+{% extends "base.html" %} {% block title %}Knowledge{% endblock %} {% block body
+%}
+<div id="knowledge-page">
+  <div class="page-head">
+    <div>
+      <h1>Knowledge base</h1>
+      <p class="lede">
+        Internal Northstar Cloud articles used during retrieval.
+      </p>
+    </div>
+  </div>
+
+  <form
+    class="filters"
+    method="get"
+    action="/knowledge"
+    hx-get="/knowledge"
+    hx-target="#knowledge-page"
+    hx-select="#knowledge-page"
+    hx-swap="outerHTML"
+    hx-push-url="true"
+    hx-trigger="submit, input delay:300ms from:input[type='search']"
+  >
+    <input
+      type="search"
+      name="q"
+      value="{{ q }}"
+      placeholder="Search articles"
+    />
+    <button type="submit">Search</button>
+  </form>
+
+  <section class="card">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Category</th>
+          <th>Component</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for article in articles %}
+        <tr>
+          <td><a href="/knowledge/{{ article.id }}">{{ article.title }}</a></td>
+          <td>{{ article.category }}</td>
+          <td class="mono">{{ article.component or "—" }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="3" class="muted">No articles.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+</div>
+{% endblock %}

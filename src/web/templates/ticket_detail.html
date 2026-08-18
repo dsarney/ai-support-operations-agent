@@ -1,0 +1,171 @@
+{% extends "base.html" %} {% block title %}{{ ticket.id }}{% endblock %} {%
+block body %}
+<div id="ticket-page">
+  <div class="page-head">
+    <div>
+      <p class="mono muted">{{ ticket.id }} · {{ ticket.channel }}</p>
+      <h1>{{ ticket.subject }}</h1>
+      <p class="lede">
+        {{ ticket.customer.company }} · {{ ticket.customer.name }} · {{
+        ticket.customer.plan }} plan
+      </p>
+    </div>
+    <div class="actions">
+      <form
+        method="post"
+        action="/tickets/{{ ticket.id }}/run"
+        hx-post="/tickets/{{ ticket.id }}/run"
+        hx-target="#ticket-page"
+        hx-select="#ticket-page"
+        hx-swap="outerHTML"
+        hx-sync="this:drop"
+        hx-disabled-elt="find button"
+        hx-indicator="#run-indicator"
+      >
+        <button type="submit">Run agent</button>
+      </form>
+      {% if ticket.status != "escalated" %}
+      <form
+        method="post"
+        action="/tickets/{{ ticket.id }}/escalate"
+        hx-post="/tickets/{{ ticket.id }}/escalate"
+        hx-target="#ticket-page"
+        hx-select="#ticket-page"
+        hx-swap="outerHTML"
+        hx-disabled-elt="find button"
+      >
+        <button class="secondary" type="submit">Escalate</button>
+      </form>
+      {% endif %}
+      <span id="run-indicator" class="htmx-indicator muted">Running…</span>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="stack">
+      <section class="card">
+        <h2>Customer message</h2>
+        <p>{{ ticket.body }}</p>
+        <p>
+          <span class="badge {{ ticket.status }}">{{ ticket.status }}</span>
+          <span class="badge {{ ticket.priority or '' }}"
+            >{{ ticket.priority or "unclassified" }}</span
+          >
+          {% if ticket.category %}<span class="badge"
+            >{{ ticket.category }}</span
+          >{% endif %}
+        </p>
+      </section>
+
+      {% if run and run.reply_text %}
+      <section class="card">
+        <h2>Draft reply</h2>
+        <div class="reply">{{ run.reply_text }}</div>
+      </section>
+      {% endif %}
+
+      <section class="card">
+        <h2>Agent timeline</h2>
+        {% if run %}
+        <p class="muted">
+          {{ run.model }} · outcome
+          <strong>{{ run.outcome or run.status }}</strong>
+        </p>
+        <ul class="timeline">
+          {% for step in run.steps %}
+          <li>
+            <div class="stage">{{ step.stage }}</div>
+            <div>{{ step.summary }}</div>
+            {% if step.tool_name or step.output_json != "{}" %}
+            <details>
+              <summary>Evidence</summary>
+              {% if step.tool_name %}
+              <p class="mono">{{ step.tool_name }} {{ step.tool_args_json }}</p>
+              {% endif %} {% if step.tool_result_json %}
+              <pre>{{ step.tool_result_json | pretty_json }}</pre>
+              {% endif %} {% if step.output_json and step.output_json != "{}" %}
+              <pre>{{ step.output_json | pretty_json }}</pre>
+              {% endif %}
+            </details>
+            {% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="muted">The agent has not run on this ticket yet.</p>
+        {% endif %}
+      </section>
+    </div>
+
+    <div class="stack">
+      <section class="card">
+        <h2>Policy</h2>
+        {% if policy %}
+        <p>
+          Risk <span class="badge">{{ policy.risk }}</span> {% if
+          policy.allow_auto_remediation %}<span class="badge open"
+            >auto-remediate</span
+          >{% endif %} {% if policy.escalate %}<span class="badge escalated"
+            >escalate</span
+          >{% endif %}
+        </p>
+        <ul>
+          {% for reason in policy.reasons %}
+          <li>{{ reason }}</li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="muted">No policy decision yet.</p>
+        {% endif %}
+      </section>
+
+      <section class="card">
+        <h2>Diagnosis</h2>
+        {% if diagnosis %}
+        <p>{{ diagnosis.likely_cause }}</p>
+        <p class="muted">
+          Action: {{ diagnosis.recommended_action }} · confidence {{
+          "%.2f"|format(diagnosis.confidence) }}
+        </p>
+        {% else %}
+        <p class="muted">No diagnosis yet.</p>
+        {% endif %}
+      </section>
+
+      <section class="card">
+        <h2>Knowledge</h2>
+        {% for article in articles %}
+        <p><a href="/knowledge/{{ article.id }}">{{ article.title }}</a></p>
+        {% else %}
+        <p class="muted">No retrieved articles.</p>
+        {% endfor %}
+      </section>
+
+      {% if ticket.incident_links %}
+      <section class="card">
+        <h2>Incidents</h2>
+        {% for link in ticket.incident_links %}
+        <p>
+          <a href="/incidents/{{ link.incident.id }}"
+            >{{ link.incident.title }}</a
+          >
+        </p>
+        {% endfor %}
+      </section>
+      {% endif %}
+
+      <section class="card">
+        <h2>Audit</h2>
+        {% for event in audit %}
+        <p class="mono muted">
+          {{ event.created_at | fmt_dt }} · {{ event.event_type }} · {{
+          event.actor }}
+        </p>
+        {% else %}
+        <p class="muted">No audit events.</p>
+        {% endfor %}
+      </section>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %} {% block title %}New ticket{% endblock %} {% block
+body %}
+<div class="page-head">
+  <div>
+    <h1>New ticket</h1>
+    <p class="lede">
+      File a synthetic Northstar ticket and optionally run the agent
+      immediately.
+    </p>
+  </div>
+</div>
+
+<form class="form card" method="post" action="/tickets/new">
+  <label
+    >Customer
+    <select name="customer_id" required>
+      {% for customer in customers %}
+      <option value="{{ customer.id }}">
+        {{ customer.company }} — {{ customer.name }}
+      </option>
+      {% endfor %}
+    </select>
+  </label>
+  <label
+    >Channel
+    <select name="channel">
+      <option value="email">email</option>
+      <option value="chat">chat</option>
+    </select>
+  </label>
+  <label
+    >Subject
+    <input name="subject" required placeholder="Short summary" />
+  </label>
+  <label
+    >Message
+    <textarea
+      name="body"
+      required
+      placeholder="What is the customer seeing?"
+    ></textarea>
+  </label>
+  <label
+    ><input type="checkbox" name="run_now" value="1" /> Run the agent after
+    creating</label
+  >
+  <button type="submit">Create ticket</button>
+</form>
+{% endblock %}

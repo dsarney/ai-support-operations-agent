@@ -1,0 +1,625 @@
+{
+  "customers": [
+    {
+      "id": "cust_acme",
+      "name": "Priya Shah",
+      "email": "priya.shah@acme-analytics.test",
+      "company": "Acme Analytics",
+      "plan": "team"
+    },
+    {
+      "id": "cust_bright",
+      "name": "Marcus Cole",
+      "email": "marcus.cole@brightline-health.test",
+      "company": "Brightline Health",
+      "plan": "starter"
+    },
+    {
+      "id": "cust_helio",
+      "name": "Elena Voss",
+      "email": "elena.voss@helio-commerce.test",
+      "company": "Helio Commerce",
+      "plan": "team"
+    },
+    {
+      "id": "cust_lumen",
+      "name": "Jonah Park",
+      "email": "jonah.park@lumen-labs.test",
+      "company": "Lumen Labs",
+      "plan": "team"
+    },
+    {
+      "id": "cust_orbit",
+      "name": "Sofia Alvarez",
+      "email": "sofia.alvarez@orbit-freight.test",
+      "company": "Orbit Freight",
+      "plan": "starter"
+    },
+    {
+      "id": "cust_nimbus",
+      "name": "Chris Ng",
+      "email": "chris.ng@nimbus-design.test",
+      "company": "Nimbus Design",
+      "plan": "team"
+    },
+    {
+      "id": "cust_peak",
+      "name": "Amelia Hart",
+      "email": "amelia.hart@peak-metrics.test",
+      "company": "Peak Metrics",
+      "plan": "starter"
+    },
+    {
+      "id": "cust_river",
+      "name": "Noah Klein",
+      "email": "noah.klein@riverbank.test",
+      "company": "Riverbank",
+      "plan": "team"
+    },
+    {
+      "id": "cust_summit",
+      "name": "Harper Quinn",
+      "email": "harper.quinn@summit-legal.test",
+      "company": "Summit Legal",
+      "plan": "enterprise"
+    },
+    {
+      "id": "cust_atlas",
+      "name": "Ibrahim Rahman",
+      "email": "ibrahim.rahman@atlas-corp.test",
+      "company": "Atlas Corp",
+      "plan": "enterprise"
+    },
+    {
+      "id": "cust_vega",
+      "name": "Lina Ortega",
+      "email": "lina.ortega@vega-systems.test",
+      "company": "Vega Systems",
+      "plan": "team"
+    },
+    {
+      "id": "cust_quartz",
+      "name": "Ben Ito",
+      "email": "ben.ito@quartz-bio.test",
+      "company": "Quartz Bio",
+      "plan": "team"
+    },
+    {
+      "id": "cust_ink",
+      "name": "Mira Patel",
+      "email": "mira.patel@inkandco.test",
+      "company": "Ink & Co",
+      "plan": "starter"
+    },
+    {
+      "id": "cust_field",
+      "name": "Owen Blake",
+      "email": "owen.blake@fieldnote.test",
+      "company": "Fieldnote",
+      "plan": "team"
+    },
+    {
+      "id": "cust_cedar",
+      "name": "Grace Cho",
+      "email": "grace.cho@cedar-payments.test",
+      "company": "Cedar Payments",
+      "plan": "enterprise"
+    },
+    {
+      "id": "cust_maple",
+      "name": "Theo Ward",
+      "email": "theo.ward@maple-hr.test",
+      "company": "Maple HR",
+      "plan": "team"
+    },
+    {
+      "id": "cust_pine",
+      "name": "Ava Rossi",
+      "email": "ava.rossi@pine-studio.test",
+      "company": "Pine Studio",
+      "plan": "starter"
+    }
+  ],
+  "subscriptions": [
+    {
+      "id": "sub_acme",
+      "customer_id": "cust_acme",
+      "status": "active",
+      "plan": "team",
+      "seats": 12,
+      "renews_on": "2026-11-01"
+    },
+    {
+      "id": "sub_bright",
+      "customer_id": "cust_bright",
+      "status": "active",
+      "plan": "starter",
+      "seats": 3,
+      "renews_on": "2026-09-14"
+    },
+    {
+      "id": "sub_helio",
+      "customer_id": "cust_helio",
+      "status": "active",
+      "plan": "team",
+      "seats": 8,
+      "renews_on": "2026-10-02"
+    },
+    {
+      "id": "sub_lumen",
+      "customer_id": "cust_lumen",
+      "status": "active",
+      "plan": "team",
+      "seats": 10,
+      "renews_on": "2026-12-08"
+    },
+    {
+      "id": "sub_orbit",
+      "customer_id": "cust_orbit",
+      "status": "active",
+      "plan": "starter",
+      "seats": 2,
+      "renews_on": "2026-08-30"
+    },
+    {
+      "id": "sub_nimbus",
+      "customer_id": "cust_nimbus",
+      "status": "active",
+      "plan": "team",
+      "seats": 6,
+      "renews_on": "2026-09-22"
+    },
+    {
+      "id": "sub_peak",
+      "customer_id": "cust_peak",
+      "status": "active",
+      "plan": "starter",
+      "seats": 1,
+      "renews_on": "2026-10-19"
+    },
+    {
+      "id": "sub_river",
+      "customer_id": "cust_river",
+      "status": "active",
+      "plan": "team",
+      "seats": 15,
+      "renews_on": "2026-11-11"
+    },
+    {
+      "id": "sub_summit",
+      "customer_id": "cust_summit",
+      "status": "active",
+      "plan": "enterprise",
+      "seats": 80,
+      "renews_on": "2027-01-05"
+    },
+    {
+      "id": "sub_atlas",
+      "customer_id": "cust_atlas",
+      "status": "active",
+      "plan": "enterprise",
+      "seats": 200,
+      "renews_on": "2026-12-01"
+    },
+    {
+      "id": "sub_vega",
+      "customer_id": "cust_vega",
+      "status": "active",
+      "plan": "team",
+      "seats": 9,
+      "renews_on": "2026-09-09"
+    },
+    {
+      "id": "sub_quartz",
+      "customer_id": "cust_quartz",
+      "status": "past_due",
+      "plan": "team",
+      "seats": 7,
+      "renews_on": "2026-08-01"
+    },
+    {
+      "id": "sub_ink",
+      "customer_id": "cust_ink",
+      "status": "active",
+      "plan": "starter",
+      "seats": 2,
+      "renews_on": "2026-10-04"
+    },
+    {
+      "id": "sub_field",
+      "customer_id": "cust_field",
+      "status": "active",
+      "plan": "team",
+      "seats": 11,
+      "renews_on": "2026-11-20"
+    },
+    {
+      "id": "sub_cedar",
+      "customer_id": "cust_cedar",
+      "status": "active",
+      "plan": "enterprise",
+      "seats": 40,
+      "renews_on": "2027-02-14"
+    },
+    {
+      "id": "sub_maple",
+      "customer_id": "cust_maple",
+      "status": "active",
+      "plan": "team",
+      "seats": 14,
+      "renews_on": "2026-09-18"
+    },
+    {
+      "id": "sub_pine",
+      "customer_id": "cust_pine",
+      "status": "active",
+      "plan": "starter",
+      "seats": 4,
+      "renews_on": "2026-12-12"
+    }
+  ],
+  "account_states": [
+    {
+      "customer_id": "cust_acme",
+      "locked": true,
+      "lock_reason": "Too many failed sign-in attempts",
+      "failed_sign_in_attempts": 8,
+      "email_verified": true,
+      "api_key_prefix": "nsk_live_acme",
+      "webhook_url": "https://hooks.acme-analytics.test/northstar",
+      "webhook_status": "healthy",
+      "cache_stale": false
+    },
+    {
+      "customer_id": "cust_bright",
+      "locked": false,
+      "failed_sign_in_attempts": 0,
+      "email_verified": false,
+      "api_key_prefix": "nsk_live_brgt",
+      "webhook_url": null,
+      "webhook_status": "healthy",
+      "cache_stale": false
+    },
+    {
+      "customer_id": "cust_helio",
+      "locked": false,
+      "failed_sign_in_attempts": 1,
+      "email_verified": true,
+      "api_key_prefix": "nsk_live_helio",
+      "webhook_url": "https://api.helio-commerce.test/webhooks/ns",
+      "webhook_status": "failed",
+      "webhook_last_error": "TLS handshake timeout after 10s",
+      "cache_stale": false
+    },
+    {
+      "customer_id": "cust_lumen",
+      "locked": false,
+      "failed_sign_in_attempts": 0,
+      "email_verified": true,
+      "api_key_prefix": "nsk_live_lumen",
+      "webhook_url": "https://lumen-labs.test/hooks",
+      "webhook_status": "healthy",
+      "cache_stale": true
+    },
+    {
+      "customer_id": "cust_orbit",
+      "locked": false,
+      "failed_sign_in_attempts": 0,
+      "email_verified": true,
+      "api_key_prefix": "nsk_live_orbit",
+      "webhook_url": null,
+      "webhook_status": "healthy",
+      "cache_stale": false
+    },
+    {
+      "customer_id": "cust_nimbus",
+      "locked": false,
+      "failed_sign_in_attempts": 0,
+      "email_verified": true,
+      "api_key_prefix": "nsk_live_nimb",
+      "webhook_url": null,
+      "webhook_status": "healthy",
+      "cache_stale": false
+    },
+    {
+      "customer_id": "cust_peak",
+      "locked": false,
+      "failed_sign_in_attempts": 0,
+      "email_verified": true,
+      "api_key_prefix": "nsk_live_peak",
+      "webhook_url": null,
+      "webhook_status": "healthy",
+      "cache_stale": false
+    },
+    {
+      "customer_id": "cust_river",
+      "locked": false,
+      "failed_sign_in_attempts": 0,
+      "email_verified": true,
+      "api_key_prefix": "nsk_live_rivr",
+      "webhook_url": "https://riverbank.test/ns-hook",
+      "webhook_status": "healthy",
+      "cache_stale": false
+    },
+    {
+      "customer_id": "cust_summit",
+      "locked": false,
+      "failed_sign_in_attempts": 0,
+      "email_verified": true,
+      "api_key_prefix": "nsk_live_summ",
+      "webhook_url": "https://summit-legal.test/hooks/northstar",
+      "webhook_status": "healthy",
+      "cache_stale": false
+    },
+    {
+      "customer_id": "cust_atlas",
+      "locked": false,
+      "failed_sign_in_attempts": 0,
+      "email_verified": true,
+      "api_key_prefix": "nsk_live_atls",
+      "webhook_url": "https://atlas-corp.test/integrations/ns",
+      "webhook_status": "healthy",
+      "cache_stale": false
+    },
+    {
+      "customer_id": "cust_vega",
+      "locked": false,
+      "failed_sign_in_attempts": 2,
+      "email_verified": true,
+      "api_key_prefix": "nsk_live_vega",
+      "webhook_url": null,
+      "webhook_status": "healthy",
+      "cache_stale": false
+    },
+    {
+      "customer_id": "cust_quartz",
+      "locked": false,
+      "failed_sign_in_attempts": 0,
+      "email_verified": true,
+      "api_key_prefix": "nsk_live_qrtz",
+      "webhook_url": null,
+      "webhook_status": "healthy",
+      "cache_stale": false
+    },
+    {
+      "customer_id": "cust_ink",
+      "locked": false,
+      "failed_sign_in_attempts": 0,
+      "email_verified": true,
+      "api_key_prefix": "nsk_live_ink",
+      "webhook_url": null,
+      "webhook_status": "healthy",
+      "cache_stale": false
+    },
+    {
+      "customer_id": "cust_field",
+      "locked": false,
+      "failed_sign_in_attempts": 0,
+      "email_verified": true,
+      "api_key_prefix": "nsk_live_fld",
+      "webhook_url": "https://fieldnote.test/webhooks",
+      "webhook_status": "healthy",
+      "cache_stale": false
+    },
+    {
+      "customer_id": "cust_cedar",
+      "locked": false,
+      "failed_sign_in_attempts": 0,
+      "email_verified": true,
+      "api_key_prefix": "nsk_live_cedr",
+      "webhook_url": "https://cedar-payments.test/ns",
+      "webhook_status": "healthy",
+      "cache_stale": false
+    },
+    {
+      "customer_id": "cust_maple",
+      "locked": false,
+      "failed_sign_in_attempts": 0,
+      "email_verified": true,
+      "api_key_prefix": "nsk_live_mapl",
+      "webhook_url": null,
+      "webhook_status": "healthy",
+      "cache_stale": false
+    },
+    {
+      "customer_id": "cust_pine",
+      "locked": false,
+      "failed_sign_in_attempts": 0,
+      "email_verified": true,
+      "api_key_prefix": "nsk_live_pine",
+      "webhook_url": null,
+      "webhook_status": "healthy",
+      "cache_stale": false
+    }
+  ],
+  "invoices": [
+    {
+      "id": "inv_summit_jul",
+      "customer_id": "cust_summit",
+      "amount_cents": 480000,
+      "status": "paid",
+      "period": "2026-07"
+    },
+    {
+      "id": "inv_summit_aug",
+      "customer_id": "cust_summit",
+      "amount_cents": 480000,
+      "status": "open",
+      "period": "2026-08"
+    },
+    {
+      "id": "inv_quartz_jul",
+      "customer_id": "cust_quartz",
+      "amount_cents": 89000,
+      "status": "paid",
+      "period": "2026-07"
+    },
+    {
+      "id": "inv_quartz_aug",
+      "customer_id": "cust_quartz",
+      "amount_cents": 89000,
+      "status": "failed",
+      "period": "2026-08"
+    },
+    {
+      "id": "inv_acme_aug",
+      "customer_id": "cust_acme",
+      "amount_cents": 129000,
+      "status": "paid",
+      "period": "2026-08"
+    }
+  ],
+  "service_components": [
+    {
+      "id": "api-gateway",
+      "name": "API Gateway",
+      "status": "degraded",
+      "message": "Elevated 502/503 rates in us-east-1 since 16:40 UTC. Edge cache failover in progress."
+    },
+    {
+      "id": "auth",
+      "name": "Authentication",
+      "status": "operational",
+      "message": "Sign-in, SSO, and lockout services are healthy."
+    },
+    {
+      "id": "billing",
+      "name": "Billing",
+      "status": "operational",
+      "message": "Invoices and subscription mutations are healthy."
+    },
+    {
+      "id": "webhooks",
+      "name": "Outbound webhooks",
+      "status": "operational",
+      "message": "Delivery workers are healthy. Individual workspace failures still possible."
+    },
+    {
+      "id": "cache",
+      "name": "Workspace cache",
+      "status": "operational",
+      "message": "Regional caches are healthy. Stale workspace views can be cleared per tenant."
+    }
+  ],
+  "tickets": [
+    {
+      "id": "TCK-1001",
+      "customer_id": "cust_acme",
+      "subject": "Locked out of my workspace after password retries",
+      "body": "Hi, I tried my password a few times this morning and now Northstar says the account is locked. I need to get into Acme Analytics before standup. Can you unlock it?",
+      "channel": "email"
+    },
+    {
+      "id": "TCK-1002",
+      "customer_id": "cust_bright",
+      "subject": "Never received the verification email",
+      "body": "We signed up yesterday but the verification email never arrived. I checked spam. Can you resend the verification email to marcus.cole@brightline-health.test?",
+      "channel": "chat"
+    },
+    {
+      "id": "TCK-1003",
+      "customer_id": "cust_helio",
+      "subject": "Order webhooks are failing",
+      "body": "Our order.created webhook has been failing since last night. Helio checkout is not getting Northstar events. Please retry the failed webhook for our workspace.",
+      "channel": "email"
+    },
+    {
+      "id": "TCK-1004",
+      "customer_id": "cust_lumen",
+      "subject": "Dashboard still showing yesterday's usage",
+      "body": "The usage dashboard is not updating. It looks cached from yesterday. I already refreshed the browser. Can you clear the workspace cache?",
+      "channel": "email"
+    },
+    {
+      "id": "TCK-1005",
+      "customer_id": "cust_orbit",
+      "subject": "Please rotate our workspace API key",
+      "body": "A contractor left Orbit Freight and had the live API key in their shell history. Please rotate the workspace API key. We will update our jobs after.",
+      "channel": "email"
+    },
+    {
+      "id": "TCK-1006",
+      "customer_id": "cust_nimbus",
+      "subject": "How do we set up SSO with Okta?",
+      "body": "We're on the team plan and want to turn on SSO. Can you point me to the steps for Okta SAML? We do not need you to configure it for us.",
+      "channel": "email"
+    },
+    {
+      "id": "TCK-1007",
+      "customer_id": "cust_peak",
+      "subject": "What are the API rate limits on starter?",
+      "body": "Docs are a bit scattered. What are the rate limits for the starter plan, and what header should we look at when we are throttled?",
+      "channel": "chat"
+    },
+    {
+      "id": "TCK-1008",
+      "customer_id": "cust_river",
+      "subject": "How do I invite teammates?",
+      "body": "I am an admin at Riverbank. Where is the invite flow and can I restrict invites to our domain?",
+      "channel": "email"
+    },
+    {
+      "id": "TCK-1009",
+      "customer_id": "cust_summit",
+      "subject": "We want a full refund for August",
+      "body": "This product has not delivered the SLA we were promised. Issue a full refund for August immediately and confirm in writing. If this is not done today we will dispute the charge.",
+      "channel": "email"
+    },
+    {
+      "id": "TCK-1010",
+      "customer_id": "cust_atlas",
+      "subject": "GDPR: delete all personal data for an ex-employee",
+      "body": "Under GDPR please delete all my data and the personal data of an ex-employee, including backups. We also need a written confirmation for our DPO. This is a legal request.",
+      "channel": "email"
+    },
+    {
+      "id": "TCK-1011",
+      "customer_id": "cust_vega",
+      "subject": "Unrecognized login from another country — I think we were hacked",
+      "body": "I got an alert for a sign-in from a location I did not recognize. I didn't log in from there. I think the account was hacked. Please investigate before anything else.",
+      "channel": "email"
+    },
+    {
+      "id": "TCK-1012",
+      "customer_id": "cust_quartz",
+      "subject": "Charged twice this month",
+      "body": "Quartz Bio was charged twice this month and the latest invoice failed. This is a billing dispute. Do not take more payment until someone on your finance team reviews it.",
+      "channel": "email"
+    },
+    {
+      "id": "TCK-1013",
+      "customer_id": "cust_ink",
+      "subject": "It's broken",
+      "body": "Nothing works. Fix it. I don't know what else to tell you.",
+      "channel": "chat"
+    },
+    {
+      "id": "TCK-1014",
+      "customer_id": "cust_field",
+      "subject": "API returning 502 for list endpoints",
+      "body": "Since this afternoon GET /v1/records is returning 502 from the API gateway. This is blocking Fieldnote sync jobs. Any incident on your side?",
+      "channel": "email"
+    },
+    {
+      "id": "TCK-1015",
+      "customer_id": "cust_cedar",
+      "subject": "Critical: API timeouts in production",
+      "body": "Enterprise customer. Our production calls to the Northstar API are timing out. Looks like api-gateway. This is critical for Cedar Payments checkout.",
+      "channel": "email"
+    },
+    {
+      "id": "TCK-1016",
+      "customer_id": "cust_maple",
+      "subject": "Intermittent 503s from Northstar API",
+      "body": "We are seeing intermittent 503 responses from the API gateway. Maple HR payroll export is stalling. Please advise if there is an outage.",
+      "channel": "chat"
+    },
+    {
+      "id": "TCK-1017",
+      "customer_id": "cust_pine",
+      "subject": "API gateway errors on upload",
+      "body": "Uploading assets fails with API gateway errors (502/503). Started around the same time as other folks in the Discord. Is api-gateway degraded?",
+      "channel": "email"
+    }
+  ]
+}

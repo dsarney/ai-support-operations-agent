@@ -1,0 +1,51 @@
+{% extends "base.html" %} {% block title %}{{ incident.title }}{% endblock %} {%
+block body %}
+<div class="page-head">
+  <div>
+    <p class="mono muted">{{ incident.id }}</p>
+    <h1>{{ incident.title }}</h1>
+    <p class="lede">{{ incident.summary }}</p>
+  </div>
+  <span class="badge {{ incident.status }}">{{ incident.status }}</span>
+</div>
+
+{% if component %}
+<section class="card" style="margin-bottom: 1rem">
+  <h2>{{ component.name }}</h2>
+  <p>
+    <span class="badge {{ component.status }}">{{ component.status }}</span> {{
+    component.message }}
+  </p>
+</section>
+{% endif %}
+
+<section class="card">
+  <h2>Linked tickets</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Company</th>
+        <th>Subject</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for link in incident.tickets %}
+      <tr>
+        <td class="mono">
+          <a href="/tickets/{{ link.ticket.id }}">{{ link.ticket.id }}</a>
+        </td>
+        <td>{{ link.ticket.customer.company }}</td>
+        <td>{{ link.ticket.subject }}</td>
+        <td>
+          <span class="badge {{ link.ticket.status }}"
+            >{{ link.ticket.status }}</span
+          >
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

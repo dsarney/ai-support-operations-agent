@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}SupportOps{% endblock %} · Northstar Cloud</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <div class="shell">
+    <aside class="nav">
+      <a class="brand" href="/">
+        <span class="brand-mark">NS</span>
+        <span>
+          <strong>SupportOps</strong>
+          <small>Northstar Cloud</small>
+        </span>
+      </a>
+      <nav>
+        <a href="/" {% if request.url.path == '/' %}class="active"{% endif %}>Overview</a>
+        <a href="/tickets" {% if request.url.path.startswith('/tickets') %}class="active"{% endif %}>Tickets</a>
+        <a href="/incidents" {% if request.url.path.startswith('/incidents') %}class="active"{% endif %}>Incidents</a>
+        <a href="/knowledge" {% if request.url.path.startswith('/knowledge') %}class="active"{% endif %}>Knowledge</a>
+        <a href="/tickets/new" class="nav-cta">New ticket</a>
+      </nav>
+      <p class="nav-foot">Synthetic demo data. No live helpdesk.</p>
+    </aside>
+    <main class="content">
+      {% block body %}{% endblock %}
+    </main>
+  </div>
+</body>
+</html>

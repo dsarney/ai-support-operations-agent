@@ -1,0 +1,84 @@
+{% extends "base.html" %} {% block title %}Tickets{% endblock %} {% block body %}
+<div id="tickets-page">
+  <div class="page-head">
+    <div>
+      <h1>Tickets</h1>
+      <p class="lede">{{ tickets|length }} in this view.</p>
+    </div>
+    <a class="btn" href="/tickets/new">New ticket</a>
+  </div>
+
+  <form
+    class="filters"
+    method="get"
+    action="/tickets"
+    hx-get="/tickets"
+    hx-target="#tickets-page"
+    hx-select="#tickets-page"
+    hx-swap="outerHTML"
+    hx-push-url="true"
+    hx-trigger="submit, change from:select, input delay:300ms from:input[type='search']"
+  >
+    <input
+      type="search"
+      name="q"
+      value="{{ q }}"
+      placeholder="Search id or subject"
+    />
+    <select name="status">
+      <option value="">All statuses</option>
+      {% for item in ["open", "in_progress", "resolved", "escalated"] %}
+      <option value="{{ item }}" {% if status == item %}selected{% endif %}>
+        {{ item }}
+      </option>
+      {% endfor %}
+    </select>
+    <select name="priority">
+      <option value="">All priorities</option>
+      {% for item in ["low", "medium", "high", "critical"] %}
+      <option value="{{ item }}" {% if priority == item %}selected{% endif %}>
+        {{ item }}
+      </option>
+      {% endfor %}
+    </select>
+    <button type="submit">Filter</button>
+  </form>
+
+  <section class="card">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Company</th>
+          <th>Subject</th>
+          <th>Category</th>
+          <th>Priority</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ticket in tickets %}
+        <tr>
+          <td class="mono">
+            <a href="/tickets/{{ ticket.id }}">{{ ticket.id }}</a>
+          </td>
+          <td>{{ ticket.customer.company }}</td>
+          <td>{{ ticket.subject }}</td>
+          <td>{{ ticket.category or "—" }}</td>
+          <td>
+            <span class="badge {{ ticket.priority or '' }}">{{ ticket.priority or "—" }}</span>
+          </td>
+          <td>
+            <span class="badge {{ ticket.status }}">{{ ticket.status }}</span>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6" class="muted">No matching tickets.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+</div>
+{% endblock %}

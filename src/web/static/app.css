@@ -1,0 +1,384 @@
+:root {
+  --bg: #12151c;
+  --bg-2: #181c25;
+  --surface: #1e2430;
+  --surface-2: #252c3a;
+  --line: #343c4d;
+  --text: #e8edf5;
+  --muted: #8f9bb0;
+  --amber: #e0a054;
+  --amber-dim: rgba(224, 160, 84, 0.16);
+  --teal: #6ec8b4;
+  --red: #d96a6a;
+  --blue: #7ea3d4;
+  --shadow: 0 12px 40px rgba(0, 0, 0, 0.28);
+  --radius: 14px;
+}
+
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+body {
+  font-family: "Sora", system-ui, sans-serif;
+  background:
+    radial-gradient(
+      1200px 500px at 0% -10%,
+      rgba(224, 160, 84, 0.08),
+      transparent 50%
+    ),
+    var(--bg);
+  color: var(--text);
+}
+
+a {
+  color: var(--amber);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+.shell {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+}
+
+.nav {
+  background: var(--bg-2);
+  border-right: 1px solid var(--line);
+  padding: 1.4rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.brand {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  color: var(--text);
+  text-decoration: none;
+}
+.brand-mark {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: var(--amber);
+  color: #1a1208;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+.brand small {
+  display: block;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.nav nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.nav nav a {
+  color: var(--muted);
+  padding: 0.55rem 0.7rem;
+  border-radius: 9px;
+  text-decoration: none;
+}
+.nav nav a:hover,
+.nav nav a.active {
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+}
+.nav-cta {
+  margin-top: 0.6rem;
+  background: var(--amber-dim) !important;
+  color: var(--amber) !important;
+}
+.nav-foot {
+  margin-top: auto;
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.content {
+  padding: 2rem 2.2rem 3rem;
+  max-width: 1180px;
+}
+
+.page-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.page-head h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.7rem;
+  letter-spacing: -0.03em;
+}
+.lede {
+  margin: 0;
+  color: var(--muted);
+}
+
+.grid-4,
+.grid-2 {
+  display: grid;
+  gap: 1rem;
+}
+.grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+.grid-2 {
+  grid-template-columns: 1.4fr 1fr;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  box-shadow: var(--shadow);
+}
+.stat .label {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+.stat .value {
+  font-size: 1.8rem;
+  margin-top: 0.2rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.table th,
+.table td {
+  text-align: left;
+  padding: 0.7rem 0.4rem;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.9rem;
+}
+.table th {
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.mono {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.82rem;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+.badge.open,
+.badge.operational {
+  color: var(--teal);
+  border-color: #2f5f55;
+}
+.badge.resolved {
+  color: var(--teal);
+}
+.badge.escalated,
+.badge.degraded,
+.badge.critical,
+.badge.high {
+  color: var(--red);
+  border-color: #6a3434;
+}
+.badge.in_progress,
+.badge.medium {
+  color: var(--amber);
+  border-color: #6a4e24;
+}
+.badge.outage {
+  color: var(--red);
+}
+
+.banner {
+  border: 1px solid #6a4e24;
+  background: var(--amber-dim);
+  border-radius: var(--radius);
+  padding: 0.9rem 1rem;
+  margin-bottom: 1rem;
+}
+.banner h3 {
+  margin: 0 0 0.2rem;
+  font-size: 0.95rem;
+}
+.banner p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.filters {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+input,
+select,
+textarea,
+button {
+  font: inherit;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.55rem 0.7rem;
+}
+textarea {
+  width: 100%;
+  min-height: 140px;
+}
+button,
+.btn {
+  background: var(--amber);
+  color: #1a1208;
+  border: 0;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-block;
+}
+button.secondary,
+.btn.secondary {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.htmx-indicator {
+  opacity: 0;
+  transition: opacity 160ms ease-in;
+}
+.htmx-request .htmx-indicator,
+.htmx-request.htmx-indicator {
+  opacity: 1;
+}
+button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.timeline {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.timeline li {
+  position: relative;
+  padding: 0 0 1.1rem 1.1rem;
+  border-left: 1px solid var(--line);
+}
+.timeline li::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  background: var(--amber);
+  border-radius: 50%;
+  position: absolute;
+  left: -5px;
+  top: 0.35rem;
+}
+.timeline .stage {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.72rem;
+  color: var(--amber);
+  text-transform: uppercase;
+}
+.timeline details {
+  margin-top: 0.35rem;
+  color: var(--muted);
+}
+.timeline pre,
+pre {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.8rem;
+  overflow: auto;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.75rem;
+  white-space: pre-wrap;
+}
+
+.reply {
+  background: var(--bg);
+  border-left: 3px solid var(--teal);
+  padding: 0.9rem 1rem;
+  border-radius: 0 12px 12px 0;
+  white-space: pre-wrap;
+}
+
+.form {
+  display: grid;
+  gap: 0.8rem;
+  max-width: 720px;
+}
+.form label {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.health-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.muted {
+  color: var(--muted);
+}
+.stack {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (max-width: 960px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+  .nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .grid-4,
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+  .nav-foot {
+    display: none;
+  }
+}
