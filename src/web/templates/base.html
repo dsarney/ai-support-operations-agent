@@ -13,13 +13,6 @@
 <body>
   <div class="shell">
     <aside class="nav">
-      <a class="brand" href="/">
-        <span class="brand-mark">NS</span>
-        <span>
-          <strong>SupportOps</strong>
-          <small>Northstar Cloud</small>
-        </span>
-      </a>
       <nav>
         <a href="/" {% if request.url.path == '/' %}class="active"{% endif %}>Overview</a>
         <a href="/tickets" {% if request.url.path.startswith('/tickets') %}class="active"{% endif %}>Tickets</a>
@@ -27,7 +20,6 @@
         <a href="/knowledge" {% if request.url.path.startswith('/knowledge') %}class="active"{% endif %}>Knowledge</a>
         <a href="/tickets/new" class="nav-cta">New ticket</a>
       </nav>
-      <p class="nav-foot">Synthetic demo data. No live helpdesk.</p>
     </aside>
     <main class="content">
       {% block body %}{% endblock %}

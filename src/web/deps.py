@@ -8,7 +8,6 @@ from fastapi import Request
 from sqlalchemy.orm import Session
 
 from src.config import Settings
-from src.llm.fake import FakeLLM
 from src.llm.openai_client import OpenAIClient
 
 
@@ -26,10 +25,8 @@ def get_session(request: Request) -> Generator[Session, None, None]:
         session.close()
 
 
-def resolve_llm(app, *, fake: bool = False):
+def resolve_llm(app):
     """Prefer an LLM injected on app.state (tests); otherwise construct OpenAIClient."""
-    if fake:
-        return FakeLLM()
     if getattr(app.state, "llm", None) is not None:
         return app.state.llm
     settings: Settings = app.state.settings

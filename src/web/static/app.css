@@ -45,8 +45,9 @@ a:hover {
 
 .shell {
   display: grid;
-  grid-template-columns: 240px 1fr;
+  grid-template-columns: 240px minmax(0, 1fr);
   min-height: 100vh;
+  width: 100%;
 }
 
 .nav {
@@ -56,30 +57,6 @@ a:hover {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-}
-
-.brand {
-  display: flex;
-  gap: 0.75rem;
-  align-items: center;
-  color: var(--text);
-  text-decoration: none;
-}
-.brand-mark {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  display: grid;
-  place-items: center;
-  background: var(--amber);
-  color: #1a1208;
-  font-weight: 700;
-  font-size: 0.85rem;
-}
-.brand small {
-  display: block;
-  color: var(--muted);
-  font-size: 0.72rem;
 }
 
 .nav nav {
@@ -104,16 +81,10 @@ a:hover {
   background: var(--amber-dim) !important;
   color: var(--amber) !important;
 }
-.nav-foot {
-  margin-top: auto;
-  color: var(--muted);
-  font-size: 0.72rem;
-  line-height: 1.4;
-}
-
 .content {
-  padding: 2rem 2.2rem 3rem;
-  max-width: 1180px;
+  padding: 2rem 2.5rem 3rem;
+  width: 100%;
+  min-width: 0;
 }
 
 .page-head {
@@ -151,6 +122,10 @@ a:hover {
   border-radius: var(--radius);
   padding: 1rem 1.1rem;
   box-shadow: var(--shadow);
+  min-width: 0;
+}
+.card:has(.table) {
+  overflow-x: auto;
 }
 .stat .label {
   color: var(--muted);
@@ -186,12 +161,20 @@ a:hover {
 }
 
 .badge {
-  display: inline-block;
-  padding: 0.15rem 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 1.65rem;
+  padding: 0 0.7rem;
+  line-height: 1;
   border-radius: 999px;
   font-size: 0.72rem;
   border: 1px solid var(--line);
   color: var(--muted);
+  white-space: nowrap;
+  vertical-align: middle;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 .badge.open,
 .badge.operational {
@@ -240,6 +223,11 @@ a:hover {
   margin-bottom: 1rem;
   flex-wrap: wrap;
 }
+.filters input,
+.filters select {
+  min-width: 0;
+  flex: 1 1 12rem;
+}
 input,
 select,
 textarea,
@@ -274,6 +262,7 @@ button.secondary,
   display: flex;
   gap: 0.5rem;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .htmx-indicator {
@@ -354,6 +343,7 @@ pre {
 .health-row {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 1rem;
   padding: 0.55rem 0;
   border-bottom: 1px solid var(--line);
@@ -366,19 +356,94 @@ pre {
   gap: 1rem;
 }
 
+@media (min-width: 1400px) {
+  .content {
+    padding: 2.2rem 3rem 3.2rem;
+  }
+}
+
+@media (max-width: 1200px) {
+  .grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 960px) {
   .shell {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .nav {
     flex-direction: row;
-    flex-wrap: wrap;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 0.75rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    gap: 0.4rem;
   }
-  .grid-4,
+  .nav nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  .nav-cta {
+    margin-top: 0;
+  }
+  .content {
+    padding: 1.4rem 1.25rem 2.5rem;
+  }
   .grid-2 {
     grid-template-columns: 1fr;
   }
-  .nav-foot {
-    display: none;
+  .page-head {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+  .form {
+    max-width: none;
+  }
+  .table {
+    min-width: 36rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .grid-4 {
+    grid-template-columns: 1fr;
+  }
+  .page-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .page-head h1 {
+    font-size: 1.35rem;
+  }
+  .stat .value {
+    font-size: 1.5rem;
+  }
+  .nav nav a {
+    padding: 0.45rem 0.55rem;
+    font-size: 0.88rem;
+  }
+  .filters {
+    flex-direction: column;
+  }
+  .filters input,
+  .filters select,
+  .filters button {
+    width: 100%;
+    flex: none;
+  }
+  .health-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+  .actions {
+    width: 100%;
+  }
+  .content {
+    padding: 1.1rem 0.9rem 2rem;
   }
 }

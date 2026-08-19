@@ -1,4 +1,4 @@
-"""Keyword-driven FakeLLM used by tests and `--fake-llm`. Does not call OpenAI."""
+"""Keyword-driven FakeLLM used by tests. Does not call OpenAI."""
 
 from __future__ import annotations
 

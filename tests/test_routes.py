@@ -30,7 +30,8 @@ def test_pages_render_after_seed(client, app):
     ):
         response = client.get(path)
         assert response.status_code == 200, path
-        assert "SupportOps" in response.text
+        assert "Overview" in response.text
+        assert "New ticket" in response.text
 
 
 def test_run_ticket_with_fake_llm(client, app):
