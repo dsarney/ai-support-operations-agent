@@ -34,6 +34,14 @@ def _customer_payload(customer: Customer) -> dict:
     }
 
 
+def _require_account_state(session, customer_id: str) -> AccountState | ToolResult:
+    """Load account flags, or a failed ToolResult when the customer has no state row."""
+    state = session.get(AccountState, customer_id)
+    if state is None:
+        return ToolResult(ok=False, error="account state not found")
+    return state
+
+
 @registry.register(
     "get_customer",
     "Look up a Northstar customer by id.",
@@ -128,9 +136,9 @@ def get_service_status(session, component: str | None = None) -> ToolResult:
     parameters=_CUSTOMER_PARAM,
 )
 def get_login_lockout(session, customer_id: str) -> ToolResult:
-    state = session.get(AccountState, customer_id)
-    if state is None:
-        return ToolResult(ok=False, error="account state not found")
+    state = _require_account_state(session, customer_id)
+    if isinstance(state, ToolResult):
+        return state
     return ToolResult(
         ok=True,
         data={
@@ -153,9 +161,9 @@ def get_login_lockout(session, customer_id: str) -> ToolResult:
     parameters=_CUSTOMER_PARAM,
 )
 def get_workspace_integrations(session, customer_id: str) -> ToolResult:
-    state = session.get(AccountState, customer_id)
-    if state is None:
-        return ToolResult(ok=False, error="account state not found")
+    state = _require_account_state(session, customer_id)
+    if isinstance(state, ToolResult):
+        return state
     return ToolResult(
         ok=True,
         data={
@@ -198,9 +206,9 @@ def search_knowledge_tool(session, query: str, limit: int = 5) -> ToolResult:
     parameters=_CUSTOMER_PARAM,
 )
 def unlock_account(session, customer_id: str) -> ToolResult:
-    state = session.get(AccountState, customer_id)
-    if state is None:
-        return ToolResult(ok=False, error="account state not found")
+    state = _require_account_state(session, customer_id)
+    if isinstance(state, ToolResult):
+        return state
     state.locked = False
     state.lock_reason = None
     state.failed_sign_in_attempts = 0
@@ -215,9 +223,9 @@ def unlock_account(session, customer_id: str) -> ToolResult:
     parameters=_CUSTOMER_PARAM,
 )
 def resend_verification_email(session, customer_id: str) -> ToolResult:
-    state = session.get(AccountState, customer_id)
-    if state is None:
-        return ToolResult(ok=False, error="account state not found")
+    state = _require_account_state(session, customer_id)
+    if isinstance(state, ToolResult):
+        return state
     state.verification_email_resent_at = utcnow()
     session.flush()
     return ToolResult(
@@ -236,9 +244,9 @@ def resend_verification_email(session, customer_id: str) -> ToolResult:
     parameters=_CUSTOMER_PARAM,
 )
 def rotate_workspace_api_key(session, customer_id: str) -> ToolResult:
-    state = session.get(AccountState, customer_id)
-    if state is None:
-        return ToolResult(ok=False, error="account state not found")
+    state = _require_account_state(session, customer_id)
+    if isinstance(state, ToolResult):
+        return state
     suffix = customer_id.replace("cust_", "")[:4]
     # Prefix only — the full secret is never returned to the agent or ticket reply.
     state.api_key_prefix = f"nsk_live_{suffix}_rot"
@@ -261,9 +269,9 @@ def rotate_workspace_api_key(session, customer_id: str) -> ToolResult:
     parameters=_CUSTOMER_PARAM,
 )
 def retry_failed_webhook(session, customer_id: str) -> ToolResult:
-    state = session.get(AccountState, customer_id)
-    if state is None:
-        return ToolResult(ok=False, error="account state not found")
+    state = _require_account_state(session, customer_id)
+    if isinstance(state, ToolResult):
+        return state
     if not state.webhook_url:
         return ToolResult(ok=False, error="workspace has no webhook URL")
     state.webhook_status = "healthy"
@@ -282,9 +290,9 @@ def retry_failed_webhook(session, customer_id: str) -> ToolResult:
     parameters=_CUSTOMER_PARAM,
 )
 def clear_workspace_cache(session, customer_id: str) -> ToolResult:
-    state = session.get(AccountState, customer_id)
-    if state is None:
-        return ToolResult(ok=False, error="account state not found")
+    state = _require_account_state(session, customer_id)
+    if isinstance(state, ToolResult):
+        return state
     state.cache_stale = False
     session.flush()
     return ToolResult(ok=True, data={"cache_stale": False, "customer_id": customer_id})

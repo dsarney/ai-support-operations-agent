@@ -22,7 +22,9 @@ class FakeLLM:
     model_name = "fake-llm"
 
     def classify(self, subject: str, body: str) -> Classification:
-        # First matching keyword wins; keep high-risk categories (refund, GDPR, takeover) first.
+        """Map ticket text to a category. First matching keyword wins."""
+        # High-risk categories (refund, GDPR, takeover, dispute, outage) come first
+        # so they are never shadowed by a later lockout or how-to match.
         text = _text(subject, body)
         if "refund" in text:
             return Classification(
@@ -72,6 +74,7 @@ class FakeLLM:
                 confidence=0.86,
                 summary="Possible API gateway incident.",
             )
+        # Low-risk issues the policy may auto-remediate.
         if "locked" in text or "lockout" in text:
             return Classification(
                 category="access",
@@ -117,6 +120,7 @@ class FakeLLM:
                 confidence=0.87,
                 summary="Request to rotate a workspace API key.",
             )
+        # Documentation questions and vague tickets — no mutation.
         if "sso" in text or "okta" in text or "invite" in text or "rate limit" in text:
             return Classification(
                 category="how_to",
@@ -147,6 +151,7 @@ class FakeLLM:
     def next_investigation_action(
         self, context: InvestigationContext
     ) -> InvestigationDecision:
+        """Pick the next read-only tool, or stop when enough evidence is collected."""
         called = {step.get("tool") for step in context.prior_steps}
         cid = context.customer_id
         # Always load customer + platform health first, then ticket-specific reads.
@@ -211,7 +216,9 @@ class FakeLLM:
         kb_hits: list[KnowledgeHit],
         evidence: list[dict],
     ) -> Diagnosis:
+        """Recommend an action from category plus ticket keywords. Order matches classify()."""
         text = _text(subject, body)
+        # Escalate-only categories: never recommend a mutating action.
         if classification.category == "refund":
             return Diagnosis(
                 likely_cause="Customer is requesting a refund which cannot be automated.",
@@ -256,6 +263,7 @@ class FakeLLM:
                 service_component="api-gateway",
                 requires_human=True,
             )
+        # Allowlisted mutations that the policy may auto-execute.
         if "locked" in text:
             return Diagnosis(
                 likely_cause="Identity locked after failed sign-in attempts.",
@@ -298,6 +306,7 @@ class FakeLLM:
                 recommended_action="rotate_workspace_api_key",
                 service_component="auth",
             )
+        # Knowledge-only: reply from an article, no mutation.
         if classification.category == "how_to":
             article = kb_hits[0].title if kb_hits else "internal knowledge"
             return Diagnosis(
@@ -315,6 +324,7 @@ class FakeLLM:
         )
 
     def draft_reply(self, context: ReplyContext) -> str:
+        """Fixed templates for escalate, verified fix, how-to, and fallback."""
         name = context.customer_name.split()[0]
         if context.escalate:
             return (

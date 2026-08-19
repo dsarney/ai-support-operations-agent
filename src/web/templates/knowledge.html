@@ -1,13 +1,12 @@
-{% extends "base.html" %} {% block title %}Knowledge{% endblock %} {% block body
-%}
+{% extends "base.html" %}
+{% block title %}Knowledge{% endblock %}
+{% block body %}
 <div id="knowledge-page">
   <div class="page-head">
     <div>
       <h1>Knowledge base</h1>
-      <p class="lede">
-        Internal Northstar Cloud articles used during retrieval.
-      </p>
     </div>
+    <a class="btn" href="/knowledge/new">New knowledge</a>
   </div>
 
   <form
@@ -27,7 +26,6 @@
       value="{{ q }}"
       placeholder="Search articles"
     />
-    <button type="submit">Search</button>
   </form>
 
   <section class="card">

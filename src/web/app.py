@@ -12,6 +12,7 @@ from starlette.templating import Jinja2Templates
 
 from src.config import Settings, get_settings
 from src.db import create_db_engine, create_schema, session_factory
+from src.util import loads_dict, loads_list
 from src.web.routes import router
 
 PACKAGE_DIR = Path(__file__).resolve().parent
@@ -22,6 +23,12 @@ def _pretty_json(value) -> str:
     if value is None:
         return "{}"
     if isinstance(value, str):
+        parsed = loads_dict(value)
+        if parsed or value.strip() in {"", "{}"}:
+            return json.dumps(parsed, indent=2, default=str)
+        items = loads_list(value)
+        if items or value.strip() == "[]":
+            return json.dumps(items, indent=2, default=str)
         try:
             value = json.loads(value)
         except json.JSONDecodeError:

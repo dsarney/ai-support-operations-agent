@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 
-import json
-
 from sqlalchemy.orm import Session
 
 from src.db import utcnow
 from src.models import Incident, IncidentTicket, ServiceComponent, Ticket
 from src.schemas import Diagnosis
-from src.util import new_id
+from src.util import loads_list, new_id
 
 OPEN_STATUSES = {
     "open",
@@ -80,13 +78,7 @@ def correlate_ticket(
 
 
 def _article_ids(ticket: Ticket) -> list[str]:
-    try:
-        payload = json.loads(ticket.kb_article_ids_json or "[]")
-    except json.JSONDecodeError:
-        return []
-    if isinstance(payload, list):
-        return [str(item) for item in payload]
-    return []
+    return [str(item) for item in loads_list(ticket.kb_article_ids_json)]
 
 
 def _attach_or_create(

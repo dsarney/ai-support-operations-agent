@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
@@ -129,6 +130,4 @@ class ToolRegistry:
 
 
 def _json(payload: dict[str, Any]) -> str:
-    import json
-
     return json.dumps(payload, default=str)

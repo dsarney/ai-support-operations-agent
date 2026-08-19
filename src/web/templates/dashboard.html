@@ -1,21 +1,11 @@
-{% extends "base.html" %} {% block title %}Overview{% endblock %} {% block body
-%}
+{% extends "base.html" %}
+{% block title %}Overview{% endblock %}
+{% block body %}
 <div class="page-head">
   <div>
     <h1>Operations overview</h1>
   </div>
 </div>
-
-{% for incident in incidents %}
-<a
-  class="banner"
-  href="/incidents/{{ incident.id }}"
-  style="display: block; text-decoration: none; color: inherit"
->
-  <h3>Active incident · {{ incident.title }}</h3>
-  <p>{{ incident.summary }}</p>
-</a>
-{% endfor %}
 
 <div class="grid-4">
   <div class="card stat">
@@ -36,55 +26,39 @@
   </div>
 </div>
 
-<div class="grid-2" style="margin-top: 1rem">
-  <section class="card">
-    <h2>Recent tickets</h2>
-    <table class="table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Subject</th>
-          <th>Status</th>
-          <th>Priority</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for ticket in recent %}
-        <tr>
-          <td class="mono">
-            <a href="/tickets/{{ ticket.id }}">{{ ticket.id }}</a>
-          </td>
-          <td>{{ ticket.subject }}</td>
-          <td>
-            <span class="badge {{ ticket.status }}">{{ ticket.status }}</span>
-          </td>
-          <td>
-            <span class="badge {{ ticket.priority or '' }}"
-              >{{ ticket.priority or "—" }}</span
-            >
-          </td>
-        </tr>
-        {% else %}
-        <tr>
-          <td colspan="4" class="muted">
-            No tickets yet. Run <span class="mono">make demo</span>.
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </section>
-  <section class="card">
-    <h2>Platform health</h2>
-    {% for component in components %}
-    <div class="health-row">
-      <div>
-        <strong>{{ component.name }}</strong>
-        <div class="muted">{{ component.message }}</div>
-      </div>
-      <span class="badge {{ component.status }}">{{ component.status }}</span>
-    </div>
-    {% endfor %}
-  </section>
-</div>
+<section class="card card-follow">
+  <h2>Recent tickets</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Subject</th>
+        <th>Status</th>
+        <th>Priority</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ticket in recent %}
+      <tr>
+        <td class="mono">
+          <a href="/tickets/{{ ticket.id }}">{{ ticket.id }}</a>
+        </td>
+        <td>{{ ticket.subject }}</td>
+        <td>
+          <span class="badge {{ ticket.status }}">{{ ticket.status }}</span>
+        </td>
+        <td>
+          <span class="badge {{ ticket.priority or '' }}">{{ ticket.priority or "—" }}</span>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="4" class="muted">
+          No tickets yet. Run <span class="mono">python -m src demo</span>.
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
 {% endblock %}

@@ -124,15 +124,12 @@ def evaluate_policy(
         risk = "high"
         reasons.append("suspected account takeover")
 
-    if classification.category == "outage" or diagnosis.service_component:
-        component = diagnosis.service_component
-        if classification.category == "outage":
-            escalate = True
-            risk = "high"
-            reasons.append("outage tickets require human-owned incident response")
-        elif component == "api-gateway" and action not in TRIVIAL_ACTIONS:
-            # A service-component hint alone is not enough to escalate how-to tickets.
-            pass
+    # A service_component hint (e.g. api-gateway on a how-to ticket) is not
+    # enough to escalate; only an explicit outage category requires a human.
+    if classification.category == "outage":
+        escalate = True
+        risk = "high"
+        reasons.append("outage tickets require human-owned incident response")
 
     if diagnosis.requires_human:
         escalate = True

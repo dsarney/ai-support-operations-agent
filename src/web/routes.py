@@ -1,8 +1,8 @@
-"""HTML dashboard routes: tickets, knowledge, incidents, and manual agent runs."""
+"""HTML dashboard routes: tickets, knowledge, and manual agent runs."""
 
 from __future__ import annotations
 
-import json
+import re
 
 from fastapi import APIRouter, Depends, Form, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -10,19 +10,16 @@ from sqlalchemy.orm import Session, selectinload
 
 from src.agent.pipeline import AgentPipeline
 from src.config import Settings
-from src.db import utcnow
+from src.db import retry_on_lock, utcnow
 from src.models import (
     AgentRun,
     AuditEvent,
     Customer,
-    Incident,
-    IncidentTicket,
     KnowledgeArticle,
-    ServiceComponent,
     Ticket,
     TicketMessage,
 )
-from src.util import new_id
+from src.util import loads_dict, loads_list, new_id
 from src.web.deps import get_session, resolve_llm
 
 router = APIRouter()
@@ -40,6 +37,7 @@ def settings(request: Request) -> Settings:
 
 @router.get("/healthz")
 def healthz() -> dict:
+    """Liveness probe used by tests and process monitors."""
     return {"ok": True}
 
 
@@ -49,12 +47,6 @@ def dashboard(request: Request, session: Session = Depends(get_session)):
     resolved = session.query(Ticket).filter(Ticket.status == "resolved").count()
     escalated = session.query(Ticket).filter(Ticket.status == "escalated").count()
     in_progress = session.query(Ticket).filter(Ticket.status == "in_progress").count()
-    incidents = (
-        session.query(Incident)
-        .filter(Incident.status == "open")
-        .order_by(Incident.updated_at.desc())
-        .all()
-    )
     completed_runs = (
         session.query(AgentRun).filter(AgentRun.status == "completed").count()
     )
@@ -70,7 +62,6 @@ def dashboard(request: Request, session: Session = Depends(get_session)):
         .limit(8)
         .all()
     )
-    components = session.query(ServiceComponent).order_by(ServiceComponent.name).all()
     return templates(request).TemplateResponse(
         request,
         "dashboard.html",
@@ -80,12 +71,9 @@ def dashboard(request: Request, session: Session = Depends(get_session)):
                 "in_progress": in_progress,
                 "resolved": resolved,
                 "escalated": escalated,
-                "incidents": len(incidents),
                 "auto_rate": rate,
             },
-            "incidents": incidents,
             "recent": recent,
-            "components": components,
         },
     )
 
@@ -153,7 +141,6 @@ def create_ticket(
             id=new_id("msg"), ticket_id=ticket_id, author="customer", body=body.strip()
         )
     )
-    session.flush()
     if run_now:
         llm = resolve_llm(request.app)
         AgentPipeline(session, cfg, llm).run(ticket_id)
@@ -172,7 +159,6 @@ def ticket_detail(
             selectinload(Ticket.messages),
             selectinload(Ticket.runs).selectinload(AgentRun.steps),
             selectinload(Ticket.runs).selectinload(AgentRun.remediations),
-            selectinload(Ticket.incident_links).selectinload(IncidentTicket.incident),
         )
         .filter(Ticket.id == ticket_id)
         .one_or_none()
@@ -187,11 +173,7 @@ def ticket_detail(
         .limit(40)
         .all()
     )
-    kb_ids = []
-    try:
-        kb_ids = json.loads(ticket.kb_article_ids_json or "[]")
-    except json.JSONDecodeError:
-        kb_ids = []
+    kb_ids = loads_list(ticket.kb_article_ids_json)
     articles = []
     if kb_ids:
         articles = (
@@ -207,9 +189,9 @@ def ticket_detail(
             "run": run,
             "audit": audit,
             "articles": articles,
-            "classification": _load_json(run.classification_json if run else None),
-            "diagnosis": _load_json(run.diagnosis_json if run else None),
-            "policy": _load_json(run.policy_json if run else None),
+            "classification": loads_dict(run.classification_json if run else None),
+            "diagnosis": loads_dict(run.diagnosis_json if run else None),
+            "policy": loads_dict(run.policy_json if run else None),
         },
     )
 
@@ -268,6 +250,57 @@ def knowledge_list(
     )
 
 
+@router.get("/knowledge/new", response_class=HTMLResponse)
+def new_knowledge_form(request: Request):
+    return templates(request).TemplateResponse(request, "knowledge_new.html", {})
+
+
+@router.post("/knowledge/new")
+def create_knowledge_article(
+    request: Request,
+    session: Session = Depends(get_session),
+    article_id: str = Form(default=""),
+    title: str = Form(),
+    category: str = Form(),
+    component: str = Form(default=""),
+    body: str = Form(),
+):
+    title = title.strip()
+    category = category.strip()
+    component = component.strip() or None
+    body = body.strip()
+    if not title or not category or not body:
+        raise HTTPException(status_code=400, detail="title, category, and body are required")
+
+    article_id = _allocate_knowledge_id(session, article_id, title)
+
+    existing = session.query(KnowledgeArticle).filter_by(id=article_id).one_or_none()
+    path = f"ui://{article_id}"
+
+    if existing is not None:
+        existing.title = title
+        existing.category = category
+        existing.component = component
+        existing.body = body
+        existing.path = path
+        article = existing
+    else:
+        article = KnowledgeArticle(
+            id=article_id,
+            title=title,
+            category=category,
+            component=component,
+            body=body,
+            path=path,
+        )
+        session.add(article)
+
+    _sync_fts(session, article_id, article.title, article.body)
+
+    # 303 so a browser refresh does not re-submit the form.
+    return RedirectResponse(f"/knowledge/{article_id}", status_code=303)
+
+
 @router.get("/knowledge/{article_id}", response_class=HTMLResponse)
 def knowledge_detail(
     request: Request, article_id: str, session: Session = Depends(get_session)
@@ -277,48 +310,6 @@ def knowledge_detail(
         raise HTTPException(status_code=404, detail="Article not found")
     return templates(request).TemplateResponse(
         request, "knowledge_detail.html", {"article": article}
-    )
-
-
-@router.get("/incidents", response_class=HTMLResponse)
-def incidents_list(request: Request, session: Session = Depends(get_session)):
-    incidents = (
-        session.query(Incident)
-        .options(selectinload(Incident.tickets).selectinload(IncidentTicket.ticket))
-        .order_by(Incident.updated_at.desc())
-        .all()
-    )
-    components = session.query(ServiceComponent).all()
-    return templates(request).TemplateResponse(
-        request,
-        "incidents.html",
-        {"incidents": incidents, "components": components},
-    )
-
-
-@router.get("/incidents/{incident_id}", response_class=HTMLResponse)
-def incident_detail(
-    request: Request, incident_id: str, session: Session = Depends(get_session)
-):
-    incident = (
-        session.query(Incident)
-        .options(
-            selectinload(Incident.tickets)
-            .selectinload(IncidentTicket.ticket)
-            .selectinload(Ticket.customer)
-        )
-        .filter(Incident.id == incident_id)
-        .one_or_none()
-    )
-    if incident is None:
-        raise HTTPException(status_code=404, detail="Incident not found")
-    component = None
-    if incident.component_id:
-        component = session.get(ServiceComponent, incident.component_id)
-    return templates(request).TemplateResponse(
-        request,
-        "incident_detail.html",
-        {"incident": incident, "component": component},
     )
 
 
@@ -336,12 +327,43 @@ def _next_ticket_id(session: Session) -> str:
     return f"TCK-{next_n:04d}"
 
 
-def _load_json(raw: str | None) -> dict:
-    """Parse JSON blobs stored on AgentRun; invalid payloads become an empty dict."""
-    if not raw:
-        return {}
-    try:
-        data = json.loads(raw)
-    except json.JSONDecodeError:
-        return {}
-    return data if isinstance(data, dict) else {}
+def _sync_fts(session: Session, article_id: str, title: str, body: str) -> None:
+    """Update the FTS5 index, retrying on transient SQLite locks."""
+
+    def _write() -> None:
+        conn = session.connection()
+        conn.exec_driver_sql(
+            "DELETE FROM knowledge_fts WHERE article_id = ?",
+            (article_id,),
+        )
+        conn.exec_driver_sql(
+            "INSERT INTO knowledge_fts(article_id, title, body) VALUES (?, ?, ?)",
+            (article_id, title, body),
+        )
+
+    retry_on_lock(_write)
+
+
+_KNOWLEDGE_SLUG_RE = re.compile(r"[^a-zA-Z0-9]+")
+
+
+def _slugify(value: str) -> str:
+    """Turn a title into a short URL-safe id stem (letters, digits, hyphens)."""
+    slug = _KNOWLEDGE_SLUG_RE.sub("-", value.strip().lower()).strip("-")
+    return (slug or "knowledge")[:48]
+
+
+def _allocate_knowledge_id(session: Session, requested_id: str, title: str) -> str:
+    requested_id = requested_id.strip()
+    if requested_id:
+        # If an article already exists with this id, we treat it as an update.
+        return requested_id[:64]
+
+    base = _slugify(title)
+    candidate = base
+    i = 2
+    while session.query(KnowledgeArticle).filter_by(id=candidate).one_or_none() is not None:
+        candidate = f"{base}-{i}"
+        candidate = candidate[:64]
+        i += 1
+    return candidate

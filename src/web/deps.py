@@ -8,16 +8,17 @@ from fastapi import Request
 from sqlalchemy.orm import Session
 
 from src.config import Settings
+from src.db import retry_on_lock
 from src.llm.openai_client import OpenAIClient
 
 
 def get_session(request: Request) -> Generator[Session, None, None]:
-    """Yield a session that commits on success and rolls back on error."""
+    """Yield a session that commits on success, retrying on transient SQLite locks."""
     factory = request.app.state.session_factory
     session = factory()
     try:
         yield session
-        session.commit()
+        retry_on_lock(session.commit, attempts=3, on_retry=session.rollback)
     except Exception:
         session.rollback()
         raise

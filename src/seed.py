@@ -99,7 +99,7 @@ def seed_from_fixtures(session: Session, data_dir: Path) -> None:
 
 
 def reset_and_seed(engine, data_dir: Path) -> None:
-    """Drop and recreate all tables, then load demo fixtures (used by `make seed`)."""
+    """Drop and recreate all tables, then load demo fixtures (used by `python -m src seed`)."""
     drop_schema(engine)
     create_schema(engine)
     with Session(engine) as session:

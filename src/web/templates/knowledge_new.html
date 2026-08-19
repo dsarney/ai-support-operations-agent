@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}New knowledge{% endblock %}
+{% block body %}
+<div class="page-head">
+  <div>
+    <h1>New knowledge</h1>
+  </div>
+</div>
+
+<form class="form card" method="post" action="/knowledge/new">
+  <label>
+    Title
+    <input name="title" required placeholder="Short internal article title" />
+  </label>
+  <label>
+    Category
+    <input name="category" required placeholder="e.g. security, billing, other" />
+  </label>
+  <label>
+    Body
+    <textarea
+      name="body"
+      required
+      placeholder="Enter the knowledge content here"
+    ></textarea>
+  </label>
+  <button type="submit">Create knowledge</button>
+</form>
+{% endblock %}

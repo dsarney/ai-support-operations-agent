@@ -1,12 +1,12 @@
-{% extends "base.html" %} {% block title %}{{ article.title }}{% endblock %} {%
-block body %}
+{% extends "base.html" %}
+{% block title %}{{ article.title }}{% endblock %}
+{% block body %}
 <div class="page-head">
   <div>
     <p class="mono muted">{{ article.id }}</p>
     <h1>{{ article.title }}</h1>
     <p class="lede">
-      {{ article.category }}{% if article.component %} · {{ article.component
-      }}{% endif %}
+      {{ article.category }}{% if article.component %} · {{ article.component }}{% endif %}
     </p>
   </div>
 </div>

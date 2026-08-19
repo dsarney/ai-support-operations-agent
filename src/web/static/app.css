@@ -1,3 +1,4 @@
+/* Color tokens and shared radii. */
 :root {
   --bg: #12151c;
   --bg-2: #181c25;
@@ -43,6 +44,7 @@ a:hover {
   text-decoration: underline;
 }
 
+/* Page shell: sidebar + main column. */
 .shell {
   display: grid;
   grid-template-columns: 240px minmax(0, 1fr);
@@ -90,7 +92,7 @@ a:hover {
 .page-head {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
@@ -127,6 +129,9 @@ a:hover {
 .card:has(.table) {
   overflow-x: auto;
 }
+.card-follow {
+  margin-top: 1rem;
+}
 .stat .label {
   color: var(--muted);
   font-size: 0.78rem;
@@ -160,6 +165,7 @@ a:hover {
   font-size: 0.82rem;
 }
 
+/* Status / priority pills. */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -217,6 +223,7 @@ a:hover {
   font-size: 0.85rem;
 }
 
+/* Filters, inputs, and action buttons. */
 .filters {
   display: flex;
   gap: 0.6rem;
@@ -231,7 +238,8 @@ a:hover {
 input,
 select,
 textarea,
-button {
+button,
+.btn {
   font: inherit;
   color: var(--text);
   background: var(--bg);
@@ -250,13 +258,40 @@ button,
   border: 0;
   font-weight: 600;
   cursor: pointer;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.95rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: background 160ms ease, filter 160ms ease;
+}
+a.btn,
+a.btn:hover {
+  color: #1a1208;
+  text-decoration: none;
+}
+button:hover,
+.btn:hover {
+  background: #edb066;
+}
+button:focus-visible,
+.btn:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 3px;
 }
 button.secondary,
 .btn.secondary {
   background: transparent;
   color: var(--text);
   border: 1px solid var(--line);
+}
+button.secondary:hover,
+.btn.secondary:hover {
+  background: var(--surface);
+  color: var(--text);
 }
 .actions {
   display: flex;
@@ -278,6 +313,21 @@ button:disabled {
   opacity: 0.7;
 }
 
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.spinner {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  vertical-align: -0.15em;
+}
+
+/* Agent-run timeline on the ticket page. */
 .timeline {
   list-style: none;
   padding: 0;
@@ -331,7 +381,6 @@ pre {
 .form {
   display: grid;
   gap: 0.8rem;
-  max-width: 720px;
 }
 .form label {
   display: grid;
@@ -356,6 +405,7 @@ pre {
   gap: 1rem;
 }
 
+/* Breakpoints: wide dashboard, then stacked nav, then single-column stats. */
 @media (min-width: 1400px) {
   .content {
     padding: 2.2rem 3rem 3.2rem;

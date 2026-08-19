@@ -7,6 +7,14 @@ from src.seed import seed_from_fixtures
 REPO_DATA = Path(__file__).resolve().parents[1] / "data"
 
 
+def _seed(app) -> None:
+    """Load demo fixtures into the test app's database."""
+    session = app.state.session_factory()
+    seed_from_fixtures(session, REPO_DATA)
+    session.commit()
+    session.close()
+
+
 def test_healthz(client):
     response = client.get("/healthz")
     assert response.status_code == 200
@@ -14,32 +22,25 @@ def test_healthz(client):
 
 
 def test_pages_render_after_seed(client, app):
-    factory = app.state.session_factory
-    session = factory()
-    seed_from_fixtures(session, REPO_DATA)
-    session.commit()
-    session.close()
+    _seed(app)
 
     for path in (
         "/",
         "/tickets",
         "/knowledge",
-        "/incidents",
+        "/knowledge/new",
         "/tickets/new",
         "/tickets/TCK-1001",
     ):
         response = client.get(path)
         assert response.status_code == 200, path
         assert "Overview" in response.text
-        assert "New ticket" in response.text
+        if path in ("/tickets", "/tickets/new"):
+            assert "New ticket" in response.text
 
 
 def test_run_ticket_with_fake_llm(client, app):
-    factory = app.state.session_factory
-    session = factory()
-    seed_from_fixtures(session, REPO_DATA)
-    session.commit()
-    session.close()
+    _seed(app)
 
     response = client.post("/tickets/TCK-1001/run", follow_redirects=True)
     assert response.status_code == 200
@@ -49,11 +50,7 @@ def test_run_ticket_with_fake_llm(client, app):
 
 
 def test_ticket_filters_and_knowledge_search(client, app):
-    factory = app.state.session_factory
-    session = factory()
-    seed_from_fixtures(session, REPO_DATA)
-    session.commit()
-    session.close()
+    _seed(app)
 
     tickets = client.get("/tickets?status=open")
     assert tickets.status_code == 200
@@ -66,12 +63,28 @@ def test_ticket_filters_and_knowledge_search(client, app):
     assert 'hx-get="/knowledge"' in knowledge.text
 
 
+def test_create_knowledge_article(client, app):
+    _seed(app)
+
+    payload = {
+        "article_id": "ui-lockout-playbook",
+        "title": "UI Knowledge: Lockout Playbook",
+        "category": "security",
+        "component": "",
+        "body": "If users hit account lockout, verify password retries and email verification.",
+    }
+    response = client.post("/knowledge/new", data=payload, follow_redirects=True)
+    assert response.status_code == 200
+    assert "UI Knowledge: Lockout Playbook" in response.text
+
+    # Ensure the FTS index is updated (search uses `/knowledge?q=...`).
+    search = client.get("/knowledge?q=lockout")
+    assert search.status_code == 200
+    assert "UI Knowledge: Lockout Playbook" in search.text
+
+
 def test_escalate_ticket(client, app):
-    factory = app.state.session_factory
-    session = factory()
-    seed_from_fixtures(session, REPO_DATA)
-    session.commit()
-    session.close()
+    _seed(app)
 
     response = client.post("/tickets/TCK-1001/escalate", follow_redirects=True)
     assert response.status_code == 200

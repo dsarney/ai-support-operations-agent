@@ -23,6 +23,7 @@ def sanitize_fts_query(query: str) -> str:
 def search_knowledge(
     session: Session, query: str, limit: int = 5
 ) -> list[KnowledgeHit]:
+    """Rank articles with FTS5, then fall back to a substring LIKE search."""
     match = sanitize_fts_query(query)
     rows = (
         session.connection()

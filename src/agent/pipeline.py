@@ -22,7 +22,7 @@ from src.models import (
     TicketMessage,
 )
 from src.policy.engine import evaluate_policy
-from src.schemas import Classification, KnowledgeHit
+from src.schemas import Classification, Diagnosis, KnowledgeHit, PolicyDecision
 from src.tools import registry as default_registry
 from src.tools.registry import ToolRegistry
 from src.util import new_id
@@ -83,25 +83,52 @@ class AgentPipeline:
         self.session.add(run)
         ticket.status = "in_progress"
         ticket.updated_at = utcnow()
-        self.session.flush()
+        self.session.commit()
         self._seq = 0
 
         try:
             self._execute(ticket, customer, run)
-        except (
-            Exception
-        ) as exc:  # noqa: BLE001 - a failed run must not crash the CLI/dashboard
+        except Exception as exc:  # noqa: BLE001 - a failed run must not crash the CLI/dashboard
             run.status = "failed"
             run.outcome = "failed"
             run.error = str(exc)
             run.finished_at = utcnow()
             ticket.status = "open"  # leave the ticket retryable
             self._audit(run, ticket, "run_failed", {"error": str(exc)})
-            self.session.flush()
+            self.session.commit()
         return run
 
     def _execute(self, ticket: Ticket, customer: Customer, run: AgentRun) -> None:
         """Classify → retrieve KB → investigate → diagnose → policy → maybe remediate → reply."""
+        self._normalize(ticket, customer, run)
+        classification = self._classify(ticket, run)
+        kb_hits = self._retrieve(ticket, run)
+        evidence = self._investigate(ticket, customer, run, classification, kb_hits)
+        diagnosis = self._diagnose(ticket, run, classification, kb_hits, evidence)
+        policy = self._apply_policy(ticket, customer, run, classification, diagnosis)
+        remediated, verified, policy = self._maybe_remediate(
+            ticket, customer, run, policy
+        )
+        self._draft_reply(
+            ticket,
+            customer,
+            run,
+            classification,
+            diagnosis,
+            kb_hits,
+            policy,
+            remediated,
+            verified,
+        )
+        self._apply_outcome(ticket, run, policy, remediated, verified)
+        self._correlate(ticket, run, diagnosis)
+
+        run.status = "completed"
+        run.finished_at = utcnow()
+        ticket.updated_at = utcnow()
+        self.session.commit()
+
+    def _normalize(self, ticket: Ticket, customer: Customer, run: AgentRun) -> None:
         self._log_step(
             run,
             "normalize",
@@ -113,6 +140,7 @@ class AgentPipeline:
             },
         )
 
+    def _classify(self, ticket: Ticket, run: AgentRun) -> Classification:
         classification = self.llm.classify(ticket.subject, ticket.body)
         ticket.category = classification.category
         ticket.priority = classification.priority
@@ -128,7 +156,9 @@ class AgentPipeline:
             f"({classification.confidence:.2f})",
             output=classification.model_dump(),
         )
+        return classification
 
+    def _retrieve(self, ticket: Ticket, run: AgentRun) -> list[KnowledgeHit]:
         kb_hits = search_knowledge(
             self.session, f"{ticket.subject} {ticket.body}", limit=5
         )
@@ -139,9 +169,16 @@ class AgentPipeline:
             f"{len(kb_hits)} knowledge hits",
             output={"hits": [hit.model_dump() for hit in kb_hits]},
         )
+        return kb_hits
 
-        evidence = self._investigate(ticket, customer, run, classification, kb_hits)
-
+    def _diagnose(
+        self,
+        ticket: Ticket,
+        run: AgentRun,
+        classification: Classification,
+        kb_hits: list[KnowledgeHit],
+        evidence: list[dict],
+    ) -> Diagnosis:
         diagnosis = self.llm.diagnose(
             ticket.subject, ticket.body, classification, kb_hits, evidence
         )
@@ -152,7 +189,16 @@ class AgentPipeline:
             f"{diagnosis.likely_cause} → {diagnosis.recommended_action}",
             output=diagnosis.model_dump(),
         )
+        return diagnosis
 
+    def _apply_policy(
+        self,
+        ticket: Ticket,
+        customer: Customer,
+        run: AgentRun,
+        classification: Classification,
+        diagnosis: Diagnosis,
+    ) -> PolicyDecision:
         policy = evaluate_policy(
             classification=classification,
             diagnosis=diagnosis,
@@ -171,10 +217,18 @@ class AgentPipeline:
             output=policy.model_dump(),
         )
         self._audit(run, ticket, "policy_decision", policy.model_dump())
+        return policy
 
+    def _maybe_remediate(
+        self,
+        ticket: Ticket,
+        customer: Customer,
+        run: AgentRun,
+        policy: PolicyDecision,
+    ) -> tuple[bool, bool, PolicyDecision]:
+        """Run the allowlisted mutating tool only after the deterministic policy gate."""
         remediated = False
         verified = False
-        # Mutating tools run only after the deterministic policy gate allows them.
         if policy.allow_auto_remediation and policy.allowed_action:
             result = self.tools.execute(
                 self.session,
@@ -213,7 +267,21 @@ class AgentPipeline:
                         "reasons": [*policy.reasons, "remediation tool failed"],
                     }
                 )
+        return remediated, verified, policy
 
+    def _draft_reply(
+        self,
+        ticket: Ticket,
+        customer: Customer,
+        run: AgentRun,
+        classification: Classification,
+        diagnosis: Diagnosis,
+        kb_hits: list[KnowledgeHit],
+        policy: PolicyDecision,
+        remediated: bool,
+        verified: bool,
+    ) -> None:
+        # A mutation that did not verify is treated as escalate so we never claim a fix.
         reply = self.llm.draft_reply(
             ReplyContext(
                 customer_name=customer.name,
@@ -225,7 +293,6 @@ class AgentPipeline:
                 kb_hits=kb_hits,
                 remediated=remediated,
                 verified=verified,
-                # Treat a successful mutation that failed verification as an escalation.
                 escalate=policy.escalate or (remediated and not verified),
                 action=policy.allowed_action,
             )
@@ -238,7 +305,15 @@ class AgentPipeline:
         )
         self._log_step(run, "reply", "Drafted customer reply", output={"reply": reply})
 
-        # Resolution requires either a verified mutation or a knowledge-only reply.
+    def _apply_outcome(
+        self,
+        ticket: Ticket,
+        run: AgentRun,
+        policy: PolicyDecision,
+        remediated: bool,
+        verified: bool,
+    ) -> None:
+        """Resolve only after a verified mutation or a knowledge-only reply; otherwise escalate."""
         escalate = policy.escalate or (remediated and not verified)
         if remediated and verified and not escalate:
             ticket.status = "resolved"
@@ -259,6 +334,7 @@ class AgentPipeline:
             ticket.status = "escalated"
             run.outcome = "escalated"
 
+    def _correlate(self, ticket: Ticket, run: AgentRun, diagnosis: Diagnosis) -> None:
         incident = correlate_ticket(self.session, ticket, diagnosis)
         if incident is not None:
             self._log_step(
@@ -267,11 +343,6 @@ class AgentPipeline:
                 f"Linked to incident {incident.id}: {incident.title}",
                 output={"incident_id": incident.id, "title": incident.title},
             )
-
-        run.status = "completed"
-        run.finished_at = utcnow()
-        ticket.updated_at = utcnow()
-        self.session.flush()
 
     def _investigate(
         self,
@@ -377,7 +448,11 @@ class AgentPipeline:
         latency_ms: int = 0,
         tokens: int = 0,
     ) -> AgentStep:
-        """Persist one ordered pipeline stage so the dashboard can replay the run."""
+        """Persist one ordered pipeline stage so the dashboard can replay the run.
+
+        Commit immediately so the dashboard can show progress while later stages
+        (LLM calls, tools) are still running.
+        """
         step = AgentStep(
             id=new_id("step"),
             run_id=run.id,
@@ -394,7 +469,8 @@ class AgentPipeline:
             tokens=tokens,
         )
         self.session.add(step)
-        self.session.flush()
+        self.session.commit()
+        self._seq += 1
         return step
 
     def _audit(

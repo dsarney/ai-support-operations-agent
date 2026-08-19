@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Protocol
 
 from src.schemas import (
@@ -12,58 +13,34 @@ from src.schemas import (
 )
 
 
+@dataclass(kw_only=True)
 class InvestigationContext:
     """Inputs for choosing the next read-only tool (or stopping)."""
 
-    def __init__(
-        self,
-        *,
-        customer_id: str,
-        subject: str,
-        body: str,
-        classification: Classification,
-        kb_hits: list[KnowledgeHit],
-        prior_steps: list[dict],
-        available_tools: list[str],
-    ) -> None:
-        self.customer_id = customer_id
-        self.subject = subject
-        self.body = body
-        self.classification = classification
-        self.kb_hits = kb_hits
-        self.prior_steps = prior_steps
-        self.available_tools = available_tools
+    customer_id: str
+    subject: str
+    body: str
+    classification: Classification
+    kb_hits: list[KnowledgeHit]
+    prior_steps: list[dict]
+    available_tools: list[str]
 
 
+@dataclass(kw_only=True)
 class ReplyContext:
     """Inputs for drafting the customer-facing message after policy and optional remediation."""
 
-    def __init__(
-        self,
-        *,
-        customer_name: str,
-        subject: str,
-        body: str,
-        classification: Classification,
-        diagnosis: Diagnosis,
-        policy_reasons: list[str],
-        kb_hits: list[KnowledgeHit],
-        remediated: bool,
-        verified: bool,
-        escalate: bool,
-        action: str | None,
-    ) -> None:
-        self.customer_name = customer_name
-        self.subject = subject
-        self.body = body
-        self.classification = classification
-        self.diagnosis = diagnosis
-        self.policy_reasons = policy_reasons
-        self.kb_hits = kb_hits
-        self.remediated = remediated
-        self.verified = verified
-        self.escalate = escalate
-        self.action = action
+    customer_name: str
+    subject: str
+    body: str
+    classification: Classification
+    diagnosis: Diagnosis
+    policy_reasons: list[str]
+    kb_hits: list[KnowledgeHit]
+    remediated: bool
+    verified: bool
+    escalate: bool
+    action: str | None
 
 
 class LLMClient(Protocol):

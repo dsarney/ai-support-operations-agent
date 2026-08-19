@@ -16,9 +16,7 @@
       <nav>
         <a href="/" {% if request.url.path == '/' %}class="active"{% endif %}>Overview</a>
         <a href="/tickets" {% if request.url.path.startswith('/tickets') %}class="active"{% endif %}>Tickets</a>
-        <a href="/incidents" {% if request.url.path.startswith('/incidents') %}class="active"{% endif %}>Incidents</a>
         <a href="/knowledge" {% if request.url.path.startswith('/knowledge') %}class="active"{% endif %}>Knowledge</a>
-        <a href="/tickets/new" class="nav-cta">New ticket</a>
       </nav>
     </aside>
     <main class="content">

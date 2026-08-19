@@ -48,21 +48,27 @@ def cmd_seed(settings: Settings) -> None:
     print(f"Seeded {settings.database_url} from {data_dir}", flush=True)
 
 
-def cmd_run_all(settings: Settings) -> None:
+def cmd_run_all(settings: Settings, engine=None) -> None:
     """Run the agent on every open or in-progress ticket."""
-    engine = create_db_engine(settings.database_url)
-    create_schema(engine)
+    if engine is None:
+        engine = create_db_engine(settings.database_url)
+        create_schema(engine)
     llm = _build_llm(settings)
     with Session(engine) as session:
-        tickets = (
-            session.query(Ticket)
+        ticket_ids = [
+            tid
+            for (tid,) in session.query(Ticket.id)
             .filter(Ticket.status.in_(["open", "in_progress"]))
             .all()
-        )
-        if not tickets:
-            print("No open tickets.")
-            return
-        for ticket in tickets:
+        ]
+    if not ticket_ids:
+        print("No open tickets.")
+        return
+    for tid in ticket_ids:
+        with Session(engine) as session:
+            ticket = session.get(Ticket, tid)
+            if ticket is None:
+                continue
             print(f"Running {ticket.id} — {ticket.subject}", flush=True)
             run = AgentPipeline(session, settings, llm).run(ticket.id)
             session.commit()
@@ -89,14 +95,21 @@ def cmd_demo(settings: Settings, no_run: bool) -> None:
     cmd_seed(settings)
     print(f"\nDashboard: http://{settings.host}:{settings.port}", flush=True)
     print("Open that URL now. Tickets will fill in as the agent works.\n", flush=True)
+
+    _ensure_sqlite_dir(settings.database_url)
+    engine = create_db_engine(settings.database_url)
+    create_schema(engine)
+
     if not no_run:
         threading.Thread(
             target=cmd_run_all,
-            args=(settings,),
+            args=(settings, engine),
             daemon=True,
             name="demo-run-all",
         ).start()
-    cmd_serve(settings, reload=False)
+
+    app = create_app(settings=settings, engine=engine, llm=None)
+    uvicorn.run(app, host=settings.host, port=settings.port, reload=False)
 
 
 def main() -> None:

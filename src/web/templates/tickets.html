@@ -1,11 +1,15 @@
-{% extends "base.html" %} {% block title %}Tickets{% endblock %} {% block body %}
+{% extends "base.html" %}
+{% block title %}Tickets{% endblock %}
+{% block body %}
 <div id="tickets-page">
   <div class="page-head">
     <div>
       <h1>Tickets</h1>
-      <p class="lede">{{ tickets|length }} in this view.</p>
     </div>
-    <a class="btn" href="/tickets/new">New ticket</a>
+    <a class="btn" href="/tickets/new">
+      <span aria-hidden="true">+</span>
+      New ticket
+    </a>
   </div>
 
   <form
@@ -41,7 +45,6 @@
       </option>
       {% endfor %}
     </select>
-    <button type="submit">Filter</button>
   </form>
 
   <section class="card">

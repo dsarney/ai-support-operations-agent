@@ -1,3 +1,5 @@
+"""Deterministic allow / deny / escalate policy. The LLM cannot override these rules."""
+
 from src.policy.engine import (
     ALLOWLISTED_ACTIONS,
     DENIED_ACTIONS,
